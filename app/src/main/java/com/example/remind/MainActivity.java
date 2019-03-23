@@ -61,6 +61,7 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.text.SimpleDateFormat;
@@ -463,6 +464,11 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         String salt = String.valueOf(System.currentTimeMillis());
         String src = APP_ID + query + salt + SECURITY_KEY;
         String sign = md5(src);
+        try {
+            query = URLEncoder.encode(query, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         String stringUrl = "https://api.fanyi.baidu.com/api/trans/vip/translate";
         String realUrl=stringUrl+"?q="+query+"&from="+from+"&to="+to+"&appid="+APP_ID+"&salt="+salt+"&sign="+sign;
         HttpURLConnection urlConnection = null;

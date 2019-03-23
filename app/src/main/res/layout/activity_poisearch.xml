@@ -4,23 +4,36 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#E6E6FA"
+    android:background="#FFFFFF"
+    android:orientation="horizontal"
     tools:context=".POISearch">
+
+    <ImageView
+        android:id="@+id/toMap"
+        android:layout_width="0dp"
+        android:layout_height="40dp"
+        android:onClick="toMap"
+        app:layout_constraintHorizontal_weight="1"
+        app:layout_constraintTop_toTopOf="@id/searchText"
+        app:layout_constraintBottom_toBottomOf="@id/searchText"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@id/searchText"
+        app:srcCompat="@drawable/toleft" />
 
     <EditText
         android:id="@+id/searchText"
-        android:layout_width="320dp"
+        android:layout_width="0dp"
         android:layout_height="42dp"
-        android:layout_marginTop="10dp"
-        android:layout_marginLeft="20dp"
+        android:layout_marginTop="8dp"
+        app:layout_constraintHorizontal_weight="8"
         android:background="@drawable/shape"
-        android:typeface="monospace"
         android:gravity="center_vertical"
         android:textSize="20dp"
         android:textStyle="bold"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"/>
+        android:typeface="monospace"
+        app:layout_constraintLeft_toRightOf="@id/toMap"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <ImageView
         android:id="@+id/searchicon"
@@ -31,7 +44,14 @@
         app:layout_constraintTop_toTopOf="@id/searchText"
         app:layout_constraintRight_toRightOf="@id/searchText"/>
 
-    <EditText
+    <ListView
+        android:id="@+id/listview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        app:layout_constraintTop_toBottomOf="@id/searchText">
+    </ListView>
+
+    <!--<EditText
         android:id="@+id/editText1"
         android:layout_width="300dp"
         android:layout_height="80dp"
@@ -128,17 +148,9 @@
         app:srcCompat="@drawable/submit"
         app:layout_constraintTop_toTopOf="@id/editText3"
         app:layout_constraintBottom_toBottomOf="@id/editText3"
-        app:layout_constraintLeft_toRightOf="@id/editText3"/>
+        app:layout_constraintLeft_toRightOf="@id/editText3"/>-->
 
-    <ImageView
-        android:id="@+id/toMap"
-        android:layout_width="40dp"
-        android:layout_height="40dp"
-        android:onClick="toMap"
-        app:layout_constraintTop_toTopOf="@id/searchText"
-        app:layout_constraintBottom_toBottomOf="@id/searchText"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:srcCompat="@drawable/toleft" />
+
 
 
 </android.support.constraint.ConstraintLayout>
