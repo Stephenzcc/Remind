@@ -1,15 +1,20 @@
 package com.example.remind;
 
+import android.Manifest;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.SoundPool;
 import android.os.Vibrator;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.util.Log;
@@ -134,8 +139,18 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         aMap.setMyLocationStyle(myLocationStyle);//设置定位蓝点的Style
         //aMap.getUiSettings().setMyLocationButtonEnabled(true);设置默认定位按钮是否显示，非必需设置。
         aMap.setMyLocationEnabled(true);// 设置为true表示启动显示定位蓝点，false表示隐藏定位蓝点并不进行定位，默认是false。
-        //开始定位
-        location();
+
+
+        if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED){//未开启定位权限
+            //开启定位权限,200是标识码
+            ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},200);
+        }else{
+            //开始定位
+            location();
+            Toast.makeText(MainActivity.this,"已开启定位权限",Toast.LENGTH_LONG).show();
+        }
+
 
 
         findViewById(R.id.searchText).bringToFront();
@@ -147,6 +162,21 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
     }
 
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode){
+            case 200://刚才的识别码
+                if(grantResults[0] == PackageManager.PERMISSION_GRANTED){//用户同意权限,执行我们的操作
+                    location();//开始定位
+                }else{//用户拒绝之后,当然我们也可以弹出一个窗口,直接跳转到系统设置页面
+                    Toast.makeText(MainActivity.this,"未开启定位权限,请手动到设置去开启权限",Toast.LENGTH_LONG).show();
+                }
+                break;
+            default:break;
+        }
+    }
 
     @Override
     public void onMapClick(LatLng latLng) {
@@ -161,7 +191,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                 marker.remove();
             }
             LatLng latLng1 = new LatLng(latitude,longitude);
-            marker = aMap.addMarker(new MarkerOptions().position(latLng1).title("Destination").snippet("DefaultMarker"));
+            marker = aMap.addMarker(new MarkerOptions().position(latLng1).title("Destination").snippet("latitude:"+latitude+";longitude:"+longitude));
             try {
                 aMap.animateCamera(CameraUpdateFactory.newLatLngBounds(createBounds(lat, lon, latitude, longitude), 150),1000L,null);
             } catch (AMapException e) {
@@ -280,7 +310,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                 Log.e("AmapError", "location Error, ErrCode:"
                         + aMapLocation.getErrorCode() + ", errInfo:"
                         + aMapLocation.getErrorInfo());
-                Toast.makeText(getApplicationContext(), "定位失败", Toast.LENGTH_LONG).show();
+                Toast.makeText(getApplicationContext(), "Location failed!", Toast.LENGTH_LONG).show();
             }
         }
     }
@@ -368,7 +398,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                             marker.remove();
                         }
                         LatLng latLng = new LatLng(latitude,longitude);
-                        marker = aMap.addMarker(new MarkerOptions().position(latLng).title("Destination").snippet("DefaultMarker"));
+                        marker = aMap.addMarker(new MarkerOptions().position(latLng).title("Destination").snippet("latitude:"+String.valueOf(latitude)+";longitude:"+String.valueOf(longitude)));
                         try {
                             aMap.animateCamera(CameraUpdateFactory.newLatLngBounds(createBounds(lat, lon, latitude, longitude), 150),1000L,null);
                         } catch (AMapException e) {
@@ -382,7 +412,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                         Log.i("lgq","dddwww===="+longitude);
 
                     }else {
-                        Toast.makeText(MainActivity.this,"地名出错",Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this,"Location wrong!",Toast.LENGTH_SHORT).show();
                         Log.e("错误","error");
                         //ToastUtils.show(context,"地址名出错");
                     }

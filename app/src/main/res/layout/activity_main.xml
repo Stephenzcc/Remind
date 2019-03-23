@@ -25,7 +25,7 @@
         android:background="@drawable/shape"
         android:gravity="center_vertical"
         android:onClick="POISearch"
-        android:text="Click to search(no space)"
+        android:text="Click to search"
         android:textSize="20dp"
         android:textStyle="bold"
         app:layout_constraintLeft_toLeftOf="parent"

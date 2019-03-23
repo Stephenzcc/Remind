@@ -20,6 +20,8 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class POISearch extends AppCompatActivity {
 
@@ -144,12 +146,6 @@ public class POISearch extends AppCompatActivity {
             }
         });
 
-        /*editsave1 = findViewById(R.id.editText1);
-        editsave2 = findViewById(R.id.editText2);
-        editsave3 = findViewById(R.id.editText3);
-        editsave1.setText(es1);
-        editsave2.setText(es2);
-        editsave3.setText(es3);*/
     }
 
 
@@ -164,48 +160,56 @@ public class POISearch extends AppCompatActivity {
 
             @Override
             public void onClick(View v) {
-                ((TextView) view).setText(edit.getText().toString());
-                SharedPreferences sharedPreferences = getSharedPreferences("address", MODE_PRIVATE);
-                SharedPreferences.Editor editor = sharedPreferences.edit();
-                if(position == 0){
-                    editor.putString("save1",edit.getText().toString());
-                    editor.commit();
-                }
-                else if(position == 1){
-                    editor.putString("save2",edit.getText().toString());
-                    editor.commit();
-                }
-                else if(position == 2){
-                    editor.putString("save3",edit.getText().toString());
-                    editor.commit();
-                }
-                else if(position == 3){
-                    editor.putString("save4",edit.getText().toString());
-                    editor.commit();
-                }
-                else if(position == 4){
-                    editor.putString("save5",edit.getText().toString());
-                    editor.commit();
-                }
-                else if(position == 5){
-                    editor.putString("save6",edit.getText().toString());
-                    editor.commit();
-                }
-                String es1 = sharedPreferences.getString("save1","null");
-                String es2 = sharedPreferences.getString("save2","null");
-                String es3 = sharedPreferences.getString("save3","null");
-                String es4 = sharedPreferences.getString("save4","null");
-                String es5 = sharedPreferences.getString("save5","null");
-                String es6 = sharedPreferences.getString("save6","null");
+                String regEx = "\\s*";
+                Pattern pattern = Pattern.compile(regEx);
+                Matcher matcher = pattern.matcher(edit.getText().toString());
+                if(!matcher.matches()){
+                    SharedPreferences sharedPreferences = getSharedPreferences("address", MODE_PRIVATE);
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    if(position == 0){
+                        editor.putString("save1",edit.getText().toString());
+                        editor.commit();
+                    }
+                    else if(position == 1){
+                        editor.putString("save2",edit.getText().toString());
+                        editor.commit();
+                    }
+                    else if(position == 2){
+                        editor.putString("save3",edit.getText().toString());
+                        editor.commit();
+                    }
+                    else if(position == 3){
+                        editor.putString("save4",edit.getText().toString());
+                        editor.commit();
+                    }
+                    else if(position == 4){
+                        editor.putString("save5",edit.getText().toString());
+                        editor.commit();
+                    }
+                    else if(position == 5){
+                        editor.putString("save6",edit.getText().toString());
+                        editor.commit();
+                    }
+                    String es1 = sharedPreferences.getString("save1","null");
+                    String es2 = sharedPreferences.getString("save2","null");
+                    String es3 = sharedPreferences.getString("save3","null");
+                    String es4 = sharedPreferences.getString("save4","null");
+                    String es5 = sharedPreferences.getString("save5","null");
+                    String es6 = sharedPreferences.getString("save6","null");
 
-                data[0] = es1;
-                data[1] = es2;
-                data[2] = es3;
-                data[3] = es4;
-                data[4] = es5;
-                data[5] = es6;
+                    data[0] = es1;
+                    data[1] = es2;
+                    data[2] = es3;
+                    data[3] = es4;
+                    data[4] = es5;
+                    data[5] = es6;
 
-                dialog.dismiss();
+                    ((TextView) view).setText(edit.getText().toString());
+                    dialog.dismiss();
+                }
+                else{
+                    Toast.makeText(getApplicationContext(), "Can't be space only!", Toast.LENGTH_LONG).show();
+                }
             }
         });
         dialog = new AlertDialog.Builder(POISearch.this).setView(contview).create();
@@ -220,9 +224,17 @@ public class POISearch extends AppCompatActivity {
         Intent intent=this.getIntent();
         switch (view.getId()){
             case R.id.searchicon:
-                intent.putExtra("location", edirsearch.getText().toString());
-                setResult(RESULT_OK, intent);
-                finish();
+                String regEx = "\\s*";
+                Pattern pattern = Pattern.compile(regEx);
+                Matcher matcher = pattern.matcher(edirsearch.getText().toString());
+                if(!matcher.matches()){
+                    intent.putExtra("location", edirsearch.getText().toString());
+                    setResult(RESULT_OK, intent);
+                    finish();
+                }
+                else{
+                    Toast.makeText(getApplicationContext(), "Can't be space only!", Toast.LENGTH_LONG).show();
+                }
                 break;
             default:
 
