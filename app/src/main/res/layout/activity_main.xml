@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <com.amap.api.maps.MapView
+        android:id="@+id/map"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+    </com.amap.api.maps.MapView>
+
+    <TextView
+        android:id="@+id/searchText"
+        android:layout_width="260dp"
+        android:layout_height="42dp"
+        android:layout_marginTop="10dp"
+        android:background="@drawable/shape"
+        android:gravity="center_vertical"
+        android:onClick="POISearch"
+        android:text="Click to search(no space)"
+        android:textSize="20dp"
+        android:textStyle="bold"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"/>
+
+    <ImageView
+        android:id="@+id/imageButton"
+        android:layout_width="30dp"
+        android:layout_height="30dp"
+        android:onClick="settingsClick"
+        app:srcCompat="@drawable/settings"
+        app:layout_constraintRight_toRightOf="@+id/searchText"
+        app:layout_constraintTop_toTopOf="@+id/searchText"
+        app:layout_constraintBottom_toBottomOf="@+id/searchText"/>
+
+    <Button
+        android:id="@+id/confirmBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:layout_marginBottom="80dp"
+        android:background="@drawable/confirm"
+        android:onClick="onConfirm"
+        android:text="Confirm"
+        app:layout_constraintLeft_toLeftOf="@+id/searchText"
+        app:layout_constraintBottom_toBottomOf="parent"/>
+
+    <Button
+        android:id="@+id/cancelBtn"
+        android:layout_width="wrap_content"
+        android:layout_height="40dp"
+        android:background="@drawable/cancel"
+        android:onClick="onCancel"
+        android:text="Cancel"
+        app:layout_constraintRight_toRightOf="@id/searchText"
+        app:layout_constraintBottom_toBottomOf="@+id/confirmBtn"/>
+
+
+</android.support.constraint.ConstraintLayout>
