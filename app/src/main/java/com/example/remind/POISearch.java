@@ -35,12 +35,12 @@ public class POISearch extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_poisearch);
         SharedPreferences sharedPreferences = getSharedPreferences("address", MODE_PRIVATE);
-        String es1 = sharedPreferences.getString("save1","null");
-        String es2 = sharedPreferences.getString("save2","null");
-        String es3 = sharedPreferences.getString("save3","null");
-        String es4 = sharedPreferences.getString("save4","null");
-        String es5 = sharedPreferences.getString("save5","null");
-        String es6 = sharedPreferences.getString("save6","null");
+        String es1 = sharedPreferences.getString("save1","add address");
+        String es2 = sharedPreferences.getString("save2","add address");
+        String es3 = sharedPreferences.getString("save3","add address");
+        String es4 = sharedPreferences.getString("save4","add address");
+        String es5 = sharedPreferences.getString("save5","add address");
+        String es6 = sharedPreferences.getString("save6","add address");
 
         data[0] = es1;
         data[1] = es2;
@@ -190,12 +190,12 @@ public class POISearch extends AppCompatActivity {
                         editor.putString("save6",edit.getText().toString());
                         editor.commit();
                     }
-                    String es1 = sharedPreferences.getString("save1","null");
-                    String es2 = sharedPreferences.getString("save2","null");
-                    String es3 = sharedPreferences.getString("save3","null");
-                    String es4 = sharedPreferences.getString("save4","null");
-                    String es5 = sharedPreferences.getString("save5","null");
-                    String es6 = sharedPreferences.getString("save6","null");
+                    String es1 = sharedPreferences.getString("save1","add address");
+                    String es2 = sharedPreferences.getString("save2","add address");
+                    String es3 = sharedPreferences.getString("save3","add address");
+                    String es4 = sharedPreferences.getString("save4","add address");
+                    String es5 = sharedPreferences.getString("save5","add address");
+                    String es6 = sharedPreferences.getString("save6","add address");
 
                     data[0] = es1;
                     data[1] = es2;

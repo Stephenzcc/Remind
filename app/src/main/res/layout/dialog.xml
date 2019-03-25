@@ -15,7 +15,7 @@
         android:id="@+id/btOK_dialog"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="确定" />
+        android:text="OK" />
 
 </LinearLayout>
 

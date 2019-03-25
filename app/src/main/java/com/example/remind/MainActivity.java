@@ -1,18 +1,16 @@
 package com.example.remind;
 
 import android.Manifest;
-import android.app.Notification;
-import android.app.NotificationManager;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.SoundPool;
+import android.os.Build;
 import android.os.Vibrator;
 import android.support.annotation.NonNull;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
@@ -33,9 +31,7 @@ import com.amap.api.maps.AMapUtils;
 import com.amap.api.maps.CameraUpdateFactory;
 import com.amap.api.maps.LocationSource;
 import com.amap.api.maps.MapView;
-import com.amap.api.maps.TextureMapView;
 import com.amap.api.maps.UiSettings;
-import com.amap.api.maps.model.BitmapDescriptorFactory;
 import com.amap.api.maps.model.LatLng;
 import com.amap.api.maps.model.LatLngBounds;
 import com.amap.api.maps.model.Marker;
@@ -43,14 +39,11 @@ import com.amap.api.maps.model.MarkerOptions;
 import com.amap.api.maps.model.MyLocationStyle;
 import com.amap.api.maps.model.Polyline;
 import com.amap.api.maps.model.PolylineOptions;
-import com.amap.api.services.core.LatLonPoint;
 import com.amap.api.services.core.ServiceSettings;
 import com.amap.api.services.geocoder.GeocodeAddress;
 import com.amap.api.services.geocoder.GeocodeQuery;
 import com.amap.api.services.geocoder.GeocodeResult;
 import com.amap.api.services.geocoder.GeocodeSearch;
-import com.amap.api.services.geocoder.RegeocodeAddress;
-import com.amap.api.services.geocoder.RegeocodeQuery;
 import com.amap.api.services.geocoder.RegeocodeResult;
 
 import org.json.JSONArray;
@@ -73,7 +66,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-import java.util.Random;
 import java.util.Timer;
 import java.util.TimerTask;
 
@@ -114,6 +106,19 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
+        if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
+                != PackageManager.PERMISSION_GRANTED){//未开启定位权限
+            //开启定位权限,200是标识码
+            ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},200);
+        }else{
+            //开始定位
+            location();
+            Toast.makeText(MainActivity.this,"Already open location permission",Toast.LENGTH_LONG).show();
+        }
+
+
         //获取地图控件引用
         mapView = (MapView) findViewById(R.id.map);
         //在activity执行onCreate时执行mMapView.onCreate(savedInstanceState)，实现地图生命周期管理
@@ -141,15 +146,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         aMap.setMyLocationEnabled(true);// 设置为true表示启动显示定位蓝点，false表示隐藏定位蓝点并不进行定位，默认是false。
 
 
-        if(ContextCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACCESS_FINE_LOCATION)
-                != PackageManager.PERMISSION_GRANTED){//未开启定位权限
-            //开启定位权限,200是标识码
-            ActivityCompat.requestPermissions(MainActivity.this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},200);
-        }else{
-            //开始定位
-            location();
-            Toast.makeText(MainActivity.this,"已开启定位权限",Toast.LENGTH_LONG).show();
-        }
+
 
 
 
@@ -158,7 +155,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
         findViewById(R.id.confirmBtn).bringToFront();
         findViewById(R.id.cancelBtn).bringToFront();
 
-        mPlayer = MediaPlayer.create(this, R.raw.ring);
+
         vibrator = (Vibrator)getSystemService(Context.VIBRATOR_SERVICE);
     }
 
@@ -171,7 +168,7 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
                 if(grantResults[0] == PackageManager.PERMISSION_GRANTED){//用户同意权限,执行我们的操作
                     location();//开始定位
                 }else{//用户拒绝之后,当然我们也可以弹出一个窗口,直接跳转到系统设置页面
-                    Toast.makeText(MainActivity.this,"未开启定位权限,请手动到设置去开启权限",Toast.LENGTH_LONG).show();
+                    Toast.makeText(MainActivity.this,"Location permission not enabled，please open",Toast.LENGTH_LONG).show();
                 }
                 break;
             default:break;
@@ -364,11 +361,13 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     }
 
     public void POISearch(View view) {
-        String searchPlace=amapLocation.getCity();//获取所在城市信息
-        Log.d("MainActivity", searchPlace);
-        Intent intent_search=new Intent(MainActivity.this, POISearch.class);
-        intent_search.getStringExtra("location");//将定位的城市信息传入poi搜索事件处理
-        startActivityForResult(intent_search, 2);
+        if(!isConfirm){
+            String searchPlace=amapLocation.getCity();//获取所在城市信息
+            Log.d("MainActivity", searchPlace);
+            Intent intent_search=new Intent(MainActivity.this, POISearch.class);
+            intent_search.getStringExtra("location");//将定位的城市信息传入poi搜索事件处理
+            startActivityForResult(intent_search, 2);
+        }
     }
 
     private void getLatlon(String cityName){
@@ -547,48 +546,52 @@ public class MainActivity extends AppCompatActivity implements LocationSource, A
     }
 
     public void onConfirm(View view) {
-        if(transData!=null||ismapClick){
-            isConfirm = true;
-            timer = new Timer();
-            timer.schedule(new TimerTask() {
-                @Override
-                public void run() {//定时器循环执行的代码
-                    float distance = AMapUtils.calculateLineDistance(new LatLng(lat,lon),new LatLng(latitude,longitude));//米
-                    if(line!=null){
-                        line.remove();
-                    }
-                    if(latLngs!=null){
-                        latLngs.clear();
-                    }
-                    latLngs = new ArrayList<>();
-                    latLngs.add(new LatLng(lat,lon));
-                    latLngs.add(new LatLng(latitude,longitude));
-                    line = aMap.addPolyline(new PolylineOptions().addAll(latLngs).width(10).color(Color.argb(255, 255, 69, 0)));
-                    line.setVisible(true);
-                    if(distance<=(float)returnedInt*1000){
-                        mPlayer.start();
-                        mPlayer.setLooping(true);
-
-                        if(ifshake){
-
-                            long[] patter = {1000, 1000, 2000, 50};
-                            vibrator.vibrate(patter, 0);//重复两次上面的pattern 如果只想震动一次，index设为-1 参数2是从指定下标开始重复
+        if(!isConfirm){
+            if(transData!=null||ismapClick){
+                isConfirm = true;
+                mPlayer = MediaPlayer.create(this, R.raw.ring);
+                timer = new Timer();
+                timer.schedule(new TimerTask() {
+                    @Override
+                    public void run() {//定时器循环执行的代码
+                        float distance = AMapUtils.calculateLineDistance(new LatLng(lat,lon),new LatLng(latitude,longitude));//米
+                        if(line!=null){
+                            line.remove();
                         }
+                        if(latLngs!=null){
+                            latLngs.clear();
+                        }
+                        latLngs = new ArrayList<>();
+                        latLngs.add(new LatLng(lat,lon));
+                        latLngs.add(new LatLng(latitude,longitude));
+                        line = aMap.addPolyline(new PolylineOptions().addAll(latLngs).width(10).color(Color.argb(255, 255, 69, 0)));
+                        line.setVisible(true);
+                        if(distance<=(float)returnedInt*1000){
+                            mPlayer.start();
+                            mPlayer.setLooping(true);
 
+                            if(ifshake){
+
+                                long[] patter = {1000, 1000, 2000, 50};
+                                vibrator.vibrate(patter, 0);//重复两次上面的pattern 如果只想震动一次，index设为-1 参数2是从指定下标开始重复
+                            }
+
+                        }
+                        //Log.e("MainActivity",Float.toString(distance));
                     }
-                    //Log.e("MainActivity",Float.toString(distance));
-                }
-            },1,2000);
+                },1,2000);
+            }
         }
     }
 
+    @RequiresApi(api = Build.VERSION_CODES.HONEYCOMB)
     public void onCancel(View view) {
         if(isConfirm){
             ismapClick = false;
             isConfirm = false;
             timer.cancel();
             if(mPlayer.isPlaying()){
-                mPlayer.pause();
+                mPlayer.stop();
             }
             marker.remove();
             latLngs.clear();
